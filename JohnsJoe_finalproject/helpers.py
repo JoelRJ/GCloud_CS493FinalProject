@@ -1,3 +1,29 @@
+import json
+from six.moves.urllib.request import urlopen
+from jose import jwt
+from flask import Blueprint, jsonify
+
+# Open secret client data 
+with open('osu.us.auth0.json') as f:
+	json_file = json.load(f)
+
+ALGORITHMS = ["RS256"]
+CLIENT_ID = json_file['client_id']
+DOMAIN = json_file['domain']
+
+bp = Blueprint('errors', __name__)
+
+class AuthError(Exception):
+    def __init__(self, error, status_code):
+        self.error = error
+        self.status_code = status_code
+
+@bp.app_errorhandler(AuthError)
+def handle_auth_error(ex):
+    response = jsonify(ex.error)
+    response.status_code = ex.status_code
+    return response
+
 # Verifies JWT is authentic and valid
 def verify_jwt(request, method):
 	if 'Authorization' not in request.headers:
