@@ -1,7 +1,10 @@
 """
 Author: Joel Johnson
-Date: 5/20/2021
+Date: 6/5/2021
 Purpose: Final project for CS 493
+Description: This is the REST backend for a child development app which includes
+USERS, CHILDREN, and MILESTONES as entities. Provides basic REST functionality
+to access these entities with authentication provided by OAuth.
 """
 from flask import Flask, Blueprint, render_template, request, session, redirect, url_for
 from google.cloud import datastore
@@ -13,7 +16,7 @@ from six.moves.urllib.parse import urlencode
 
 import milestones
 import children
-from helpers import verify_jwt
+import helpers
 
 app = Flask(__name__)
 app.register_blueprint(milestones.bp)

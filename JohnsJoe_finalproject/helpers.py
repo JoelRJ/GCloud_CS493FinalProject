@@ -1,3 +1,4 @@
+# Helper functions for milestones.py and children.py
 import json
 from six.moves.urllib.request import urlopen
 from jose import jwt
@@ -23,12 +24,15 @@ def handle_auth_error(ex):
     response = jsonify(ex.error)
     response.status_code = ex.status_code
     return response
+	
+def verify_content_type(request):
+	# Accept/content types must be json or html, 406 if not
+	if not request.accept_mimetypes['application/json'] or str(request.headers.get('Content-Type', 'application/json')) != 'application/json':
+		raise AuthError({'Error': 'This API only supports JSON request and return objects.'}, 406)
 
 # Verifies JWT is authentic and valid
-def verify_jwt(request, method):
+def verify_jwt(request):
 	if 'Authorization' not in request.headers:
-		if method == 'GET':
-			return False
 		raise AuthError({"code": "invalid_header",
 						"description":
 							"Invalid header. "
@@ -42,8 +46,6 @@ def verify_jwt(request, method):
 	try:
 		unverified_header = jwt.get_unverified_header(token)
 	except jwt.JWTError:
-		if method == 'GET':
-			return False
 		raise AuthError({"code": "invalid_header",
 						"description":
 							"Invalid header. "
@@ -73,20 +75,14 @@ def verify_jwt(request, method):
 				issuer="https://"+ DOMAIN+"/"
 			)
 		except jwt.ExpiredSignatureError:
-			if method == 'GET':
-				return False
 			raise AuthError({"code": "token_expired",
 							"description": "token is expired"}, 401)
 		except jwt.JWTClaimsError:
-			if method == 'GET':
-				return False
 			raise AuthError({"code": "invalid_claims",
 							"description":
 								"incorrect claims,"
 								" please check the audience and issuer"}, 401)
 		except Exception:
-			if method == 'GET':
-				return False
 			raise AuthError({"code": "invalid_header",
 							"description":
 								"Unable to parse authentication"
