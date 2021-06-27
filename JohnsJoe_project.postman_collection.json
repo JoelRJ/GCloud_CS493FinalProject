@@ -1,0 +1,3207 @@
+{
+	"info": {
+		"_postman_id": "e2860efc-d010-4387-be4c-46198c4dcfd2",
+		"name": "hwproject-child-development",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "view all users",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {",
+							"    //Check for 2XX status code",
+							"    pm.response.to.have.status(200);",
+							"}); "
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{app_url}}/users",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add milestone",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"milestone_id\", pm.response.json()[\"id\"]);",
+							"",
+							"pm.test(\"201 status code\", function () {",
+							"    //Check for 2XX status code",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"",
+							"pm.test(\"content is valid\", function () {",
+							"    //Check if the response content is valid and matches the expected values",
+							"    //Check if the self url is correct",
+							"    pm.expect(pm.response.json()[\"activity\"]).to.eq(\"Place baby tummy down on a blanket and move the blanket slowly around the room.\");",
+							"    pm.expect(pm.response.json()[\"category\"]).to.eq(\"Physical\");",
+							"    pm.expect(pm.response.json()[\"milestone\"]).to.eq(\"Moves head from side to side while lying on stomach\");",
+							"    pm.expect(pm.response.json()[\"age\"]).to.eq(\"0-1 month\");",
+							"    const self_url = pm.environment.get(\"app_url\") + \"/milestones/\" + pm.response.json()[\"id\"];",
+							"    pm.expect(pm.response.json()[\"self\"]).to.eq(self_url);",
+							"});",
+							"",
+							" "
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"activity\": \"Place baby tummy down on a blanket and move the blanket slowly around the room.\",\n    \"category\": \"Physical\",\n    \"milestone\": \"Moves head from side to side while lying on stomach\",\n    \"age\": \"0-1 month\"\n}\n"
+				},
+				"url": {
+					"raw": "{{app_url}}/milestones",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"milestones"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add milestone with missing attributes",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"400 status code\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"400 error message\", function () {",
+							"    pm.expect(pm.response.json()[\"Error\"]).to.eq(\"The request object is missing at least one of the required attributes.\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"activity\": \"Place baby tummy down on a blanket and move the blanket slowly around the room.\",\n    \"category\": \"Physical\",\n    \"milestone\": \"Moves head from side to side while lying on stomach\"\n}"
+				},
+				"url": {
+					"raw": "{{app_url}}/milestones",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"milestones"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add milestone with invalid request format 406",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"406 status code\", function () {",
+							"    pm.response.to.have.status(406);",
+							"});",
+							"",
+							"pm.test(\"406 error message\", function () {",
+							"    pm.expect(pm.response.json()[\"Error\"]).to.eq(\"This API only supports JSON request and return objects.\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "text/html"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"activity\": \"Place baby tummy down on a blanket and move the blanket slowly around the room.\",\n    \"category\": \"Physical\",\n    \"milestone\": \"Moves head from side to side while lying on stomach\"\n}"
+				},
+				"url": {
+					"raw": "{{app_url}}/milestones",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"milestones"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get milestone (new milestone, no children)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"",
+							"pm.test(\"content is valid\", function () {",
+							"    //Check if the response content is valid and matches the expected values",
+							"    //Check if the self url is correct",
+							"    pm.expect(pm.response.json()[\"activity\"]).to.eq(\"Place baby tummy down on a blanket and move the blanket slowly around the room.\");",
+							"    pm.expect(pm.response.json()[\"category\"]).to.eq(\"Physical\");",
+							"    pm.expect(pm.response.json()[\"milestone\"]).to.eq(\"Moves head from side to side while lying on stomach\");",
+							"    pm.expect(pm.response.json()[\"age\"]).to.eq(\"0-1 month\");",
+							"    const self_url = pm.environment.get(\"app_url\") + \"/milestones/\" + pm.response.json()[\"id\"];",
+							"    pm.expect(pm.response.json()[\"self\"]).to.eq(self_url);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/milestones/{{milestone_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"milestones",
+						"{{milestone_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get milestone with invalid id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"404 not found\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"",
+							"pm.test(\"404 error message\", function () {",
+							"    pm.expect(pm.response.json()[\"Error\"]).to.equal(\"No milestone with this milestone_id exists.\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/milestones/{{invalid_milestone_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"milestones",
+						"{{invalid_milestone_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add child",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"child_id\", pm.response.json()[\"id\"]);",
+							"",
+							"pm.test(\"201 status code\", function () {",
+							"   pm.response.to.have.status(201);",
+							"});",
+							"",
+							"",
+							"pm.test(\"content is valid\", function () {",
+							"    pm.expect(pm.response.json()[\"first_name\"]).to.eq(\"Austin\");",
+							"    pm.expect(pm.response.json()[\"gender\"]).to.eq(\"male\");",
+							"    pm.expect(pm.response.json()[\"birthday\"]).to.eq(\"07/2019\");",
+							"",
+							"    const self_url = pm.environment.get(\"app_url\") + \"/children/\" + pm.response.json()[\"id\"];",
+							"    pm.expect(pm.response.json()[\"self\"]).to.eq(self_url);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"first_name\": \"Austin\",\n    \"gender\": \"male\",\n    \"birthday\": \"07/2019\"\n}\n"
+				},
+				"url": {
+					"raw": "{{app_url}}/children",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "view all users with child added",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {",
+							"    //Check for 2XX status code",
+							"    pm.response.to.have.status(200);",
+							"}); "
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{app_url}}/users",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add child with missing attributes",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"400 status code\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"400 error message\", function () {",
+							"    pm.expect(pm.response.json()[\"Error\"]).to.eq(\"The request object is missing at least one of the required attributes.\");",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"first_name\": \"Lucy\",\n    \"gender\": \"female\"\n}\n"
+				},
+				"url": {
+					"raw": "{{app_url}}/children",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add child with missing authentication",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"401 status code\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "65465465",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"first_name\": \"Lucy\",\n    \"gender\": \"female\",\n    \"birthday\": \"02/2021\"\n}\n"
+				},
+				"url": {
+					"raw": "{{app_url}}/children",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get child",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {",
+							"    //Check if error code is 2XX",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"",
+							"pm.test(\"content is valid\", function () {",
+							"    pm.expect(pm.response.json()[\"first_name\"]).to.eq(\"Austin\");",
+							"    pm.expect(pm.response.json()[\"gender\"]).to.eq(\"male\");",
+							"    pm.expect(pm.response.json()[\"birthday\"]).to.eq(\"07/2019\");",
+							"",
+							"    const self_url = pm.environment.get(\"app_url\") + \"/children/\" + pm.response.json()[\"id\"];",
+							"    pm.expect(pm.response.json()[\"self\"]).to.eq(self_url);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/children/{{child_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children",
+						"{{child_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get child without authorization",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"404 unauthorized\", function () {",
+							"    //Check for 4XX status code",
+							"    pm.response.to.have.status(401);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/children/{{child_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children",
+						"{{child_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get child with invalid id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"404 not found\", function () {",
+							"    //Check for 404 status code",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"",
+							"pm.test(\"404 error message\", function () {",
+							"    //Check for appropriate error message",
+							"    pm.expect(pm.response.json()[\"Error\"]).to.eq(\"No child with this child_id exists.\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/children/{{invalid_child_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children",
+						"{{invalid_child_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get all children with pagination",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {",
+							"   //Check for appropriate 2XX status code",
+							"   pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"only correct number of milestones in response\", function () {",
+							"    //Check for correct number of loads",
+							"    pm.expect(pm.response.json()[\"children\"].length).to.eq(1);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/children",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get all children without authorization",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"401 unauthorized\", function () {",
+							"    //Check for 4XX status code",
+							"    pm.response.to.have.status(401);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/children",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "assign milestone to child",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 status code\", function () {",
+							"    //Check for error code 2XX",
+							"    pm.response.to.have.status(204);",
+							"});",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/children/{{child_id}}/milestones/{{milestone_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children",
+						"{{child_id}}",
+						"milestones",
+						"{{milestone_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "assign milestone with invalid milestone id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"404 status code\", function () {",
+							"   //Check for error code 4XX",
+							"   pm.response.to.have.status(404);",
+							"});",
+							"",
+							"",
+							"pm.test(\"404 error message\", function () {",
+							"     //Check for error code 4XX",
+							"     pm.expect(pm.response.json()[\"Error\"]).to.eq(\"The specified milestone and/or child does not exist.\")",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/children/{{child_id}}/milestones/{{invalid_milestone_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children",
+						"{{child_id}}",
+						"milestones",
+						"{{invalid_milestone_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "assign milestone with invalid child id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"404 status code\", function () {",
+							"   //Check for error code 4XX",
+							"   pm.response.to.have.status(404);",
+							"});",
+							"",
+							"",
+							"pm.test(\"404 error message\", function () {",
+							"     //Check for error code 4XX",
+							"     pm.expect(pm.response.json()[\"Error\"]).to.eq(\"The specified milestone and/or child does not exist.\")",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/children/{{invalid_child_id}}/milestones/{{milestone_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children",
+						"{{invalid_child_id}}",
+						"milestones",
+						"{{milestone_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get milestone after child assigned",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {",
+							"    //Check for appropriate 2XX status code",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"",
+							"",
+							"pm.test(\"content is valid\", function () {",
+							"    //Check if the response content is valid and matches the expected values",
+							"    //Check if the self url is correct",
+							"    pm.expect(pm.response.json()[\"activity\"]).to.eq(\"Place baby tummy down on a blanket and move the blanket slowly around the room.\");",
+							"    pm.expect(pm.response.json()[\"category\"]).to.eq(\"Physical\");",
+							"    pm.expect(pm.response.json()[\"milestone\"]).to.eq(\"Moves head from side to side while lying on stomach\");",
+							"    pm.expect(pm.response.json()[\"age\"]).to.eq(\"0-1 month\");",
+							"    const self_url = pm.environment.get(\"app_url\") + \"/milestones/\" + pm.response.json()[\"id\"];",
+							"    pm.expect(pm.response.json()[\"self\"]).to.eq(self_url);",
+							"});",
+							"",
+							"pm.test(\"loads content is valid\", function () {",
+							"   //Check if load content is valid",
+							"   pm.expect(pm.response.json()[\"children_id_assigned\"][0]).to.eq(pm.environment.get(\"child_id\"));",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/milestones/{{milestone_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"milestones",
+						"{{milestone_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get child after assigned to milestone",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {",
+							"    //Check for appropriate status code 2XX",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"",
+							"pm.test(\"content is valid\", function () {",
+							"    pm.expect(pm.response.json()[\"first_name\"]).to.eq(\"Austin\");",
+							"    pm.expect(pm.response.json()[\"gender\"]).to.eq(\"male\");",
+							"    pm.expect(pm.response.json()[\"birthday\"]).to.eq(\"07/2019\");",
+							"",
+							"    const self_url = pm.environment.get(\"app_url\") + \"/children/\" + pm.response.json()[\"id\"];",
+							"    pm.expect(pm.response.json()[\"self\"]).to.eq(self_url);",
+							"});",
+							"",
+							"pm.test(\"milestone content is valid\", function () {",
+							"    //Check for appropriate content for carrier including self attribute",
+							"    pm.expect(pm.response.json()[\"milestones_assigned\"][0][\"id\"]).to.eq(pm.environment.get(\"milestone_id\"));",
+							"    pm.expect(pm.response.json()[\"milestones_assigned\"][0][\"self\"]).to.eq(pm.environment.get(\"app_url\") + \"/milestones/\" + pm.environment.get(\"milestone_id\"));",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/children/{{child_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children",
+						"{{child_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "remove milestone from child",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 status code\", function () {",
+							"    //Check for apprropriate status code 2XX",
+							"    pm.response.to.have.status(204);",
+							"});",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/children/{{child_id}}/milestones/{{milestone_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children",
+						"{{child_id}}",
+						"milestones",
+						"{{milestone_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get child after removed from milestone",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {",
+							"    //Check for appropriate status code 2XX",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"",
+							"pm.test(\"content is valid\", function () {",
+							"    pm.expect(pm.response.json()[\"first_name\"]).to.eq(\"Austin\");",
+							"    pm.expect(pm.response.json()[\"gender\"]).to.eq(\"male\");",
+							"    pm.expect(pm.response.json()[\"birthday\"]).to.eq(\"07/2019\");",
+							"",
+							"    const self_url = pm.environment.get(\"app_url\") + \"/children/\" + pm.response.json()[\"id\"];",
+							"    pm.expect(pm.response.json()[\"self\"]).to.eq(self_url);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/children/{{child_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children",
+						"{{child_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get milestone after child removed",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"",
+							"pm.test(\"content is valid\", function () {",
+							"    //Check if the response content is valid and matches the expected values",
+							"    //Check if the self url is correct",
+							"    pm.expect(pm.response.json()[\"activity\"]).to.eq(\"Place baby tummy down on a blanket and move the blanket slowly around the room.\");",
+							"    pm.expect(pm.response.json()[\"category\"]).to.eq(\"Physical\");",
+							"    pm.expect(pm.response.json()[\"milestone\"]).to.eq(\"Moves head from side to side while lying on stomach\");",
+							"    pm.expect(pm.response.json()[\"age\"]).to.eq(\"0-1 month\");",
+							"    const self_url = pm.environment.get(\"app_url\") + \"/milestones/\" + pm.response.json()[\"id\"];",
+							"    pm.expect(pm.response.json()[\"self\"]).to.eq(self_url);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/milestones/{{milestone_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"milestones",
+						"{{milestone_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "remove milestone - milestone not assigned to this child",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"404 status code\", function () {",
+							"    //Check for appropriate 4XX status code",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"",
+							"pm.test(\"404 error message\", function () {",
+							"    //Check for appropriate error message",
+							"    pm.expect(pm.response.json()[\"Error\"]).to.eq(\"No milestone with this milestone_id is assigned to the child with this child_id.\");",
+							"});",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/children/{{child_id}}/milestones/{{milestone_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children",
+						"{{child_id}}",
+						"milestones",
+						"{{milestone_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "remove milestone with invalid child id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"404 status code\", function () {",
+							"    //Check for appropriate 4XX status code",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"",
+							"pm.test(\"404 error message\", function () {",
+							"    //Check for appropriate error message",
+							"    pm.expect(pm.response.json()[\"Error\"]).to.eq(\"The specified milestone and/or child does not exist.\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/children/{{invalid_child_id}}/milestones/{{milestone_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children",
+						"{{invalid_child_id}}",
+						"milestones",
+						"{{milestone_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "remove milestone with invalid milestone id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"404 status code\", function () {",
+							"    //Check for appropriate 4XX status code",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"",
+							"pm.test(\"404 error message\", function () {",
+							"    //Check for appropriate error message",
+							"    pm.expect(pm.response.json()[\"Error\"]).to.eq(\"The specified milestone and/or child does not exist.\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/children/{{child_id}}/milestones/{{invalid_milestone_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children",
+						"{{child_id}}",
+						"milestones",
+						"{{invalid_milestone_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "re-assign milestone to child",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 status code\", function () {",
+							"    //Check for error code 2XX",
+							"    pm.response.to.have.status(204);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/children/{{child_id}}/milestones/{{milestone_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children",
+						"{{child_id}}",
+						"milestones",
+						"{{milestone_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete milestone",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 no content\", function () {",
+							"    //Check for appropriate 2XX status code",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{app_url}}/milestones/{{milestone_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"milestones",
+						"{{milestone_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get child after milestone deleted",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {",
+							"    //Check if error code is 2XX",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"",
+							"pm.test(\"content is valid\", function () {",
+							"    pm.expect(pm.response.json()[\"first_name\"]).to.eq(\"Austin\");",
+							"    pm.expect(pm.response.json()[\"gender\"]).to.eq(\"male\");",
+							"    pm.expect(pm.response.json()[\"birthday\"]).to.eq(\"07/2019\");",
+							"",
+							"    const self_url = pm.environment.get(\"app_url\") + \"/children/\" + pm.response.json()[\"id\"];",
+							"    pm.expect(pm.response.json()[\"self\"]).to.eq(self_url);",
+							"    pm.expect(pm.response.json()[\"milestones_assigned\"]).to.deep.equal([]);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/children/{{child_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children",
+						"{{child_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete milestone with invalid id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"404 not found\", function () {",
+							"    //Check for appropriate 4XX status code",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"",
+							"pm.test(\"404 error message\", function () {",
+							"    //Check for appropriate error message",
+							"    pm.expect(pm.response.json()[\"Error\"]).to.eq(\"No milestone with this milestone_id exists.\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/milestones/{{invalid_milestone_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"milestones",
+						"{{invalid_milestone_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete child with invalid id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"404 not found\", function () {",
+							"    //Check for appropriate 4XX status code",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"",
+							"pm.test(\"404 error message\", function () {",
+							"    //Check for appropriate error message",
+							"    pm.expect(pm.response.json()[\"Error\"]).to.eq(\"No child with this child_id exists.\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/children/{{invalid_child_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children",
+						"{{invalid_child_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add milestone",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"milestone_id\", pm.response.json()[\"id\"]);",
+							"",
+							"pm.test(\"201 status code\", function () {",
+							"    //Check for 2XX status code",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"",
+							"pm.test(\"content is valid\", function () {",
+							"    //Check if the response content is valid and matches the expected values",
+							"    //Check if the self url is correct",
+							"    pm.expect(pm.response.json()[\"activity\"]).to.eq(\"Activity II.\");",
+							"    pm.expect(pm.response.json()[\"category\"]).to.eq(\"Physical\");",
+							"    pm.expect(pm.response.json()[\"milestone\"]).to.eq(\"Moves head from side to side while lying on stomach\");",
+							"    pm.expect(pm.response.json()[\"age\"]).to.eq(\"0-1 month\");",
+							"    const self_url = pm.environment.get(\"app_url\") + \"/milestones/\" + pm.response.json()[\"id\"];",
+							"    pm.expect(pm.response.json()[\"self\"]).to.eq(self_url);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"activity\": \"Activity II.\",\n    \"category\": \"Physical\",\n    \"milestone\": \"Moves head from side to side while lying on stomach\",\n    \"age\": \"0-1 month\"\n}\n"
+				},
+				"url": {
+					"raw": "{{app_url}}/milestones",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"milestones"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "assign milestone to child",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 status code\", function () {",
+							"    //Check for error code 2XX",
+							"    pm.response.to.have.status(204);",
+							"});",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/children/{{child_id}}/milestones/{{milestone_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children",
+						"{{child_id}}",
+						"milestones",
+						"{{milestone_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "assign duplicate milestone to child",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"403 status code\", function () {",
+							"    //Check for error code 2XX",
+							"    pm.response.to.have.status(403);",
+							"});",
+							"",
+							"pm.test(\"403 error message\", function () {",
+							"    //Check for appropriate error message",
+							"    pm.expect(pm.response.json()[\"Error\"]).to.eq(\"This milestone is already assigned to the child.\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/children/{{child_id}}/milestones/{{milestone_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children",
+						"{{child_id}}",
+						"milestones",
+						"{{milestone_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "assign invalid milestone to child",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"404 status code\", function () {",
+							"    //Check for error code 404",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"pm.test(\"404 error message\", function () {",
+							"    //Check for appropriate error message",
+							"    pm.expect(pm.response.json()[\"Error\"]).to.eq(\"The specified milestone and/or child does not exist.\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/children/{{child_id}}/milestones/{{invalid_milestone_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children",
+						"{{child_id}}",
+						"milestones",
+						"{{invalid_milestone_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get child after milestone assigned",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {",
+							"    //Check for appropriate 2XX status code",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"",
+							"pm.test(\"content is valid\", function () {",
+							"    pm.expect(pm.response.json()[\"first_name\"]).to.eq(\"Austin\");",
+							"    pm.expect(pm.response.json()[\"gender\"]).to.eq(\"male\");",
+							"    pm.expect(pm.response.json()[\"birthday\"]).to.eq(\"07/2019\");",
+							"",
+							"    const self_url = pm.environment.get(\"app_url\") + \"/children/\" + pm.response.json()[\"id\"];",
+							"    pm.expect(pm.response.json()[\"self\"]).to.eq(self_url);",
+							"    pm.expect(pm.response.json()[\"milestones_assigned\"][0][\"id\"]).to.eq(pm.environment.get(\"milestone_id\"));",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/children/{{child_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children",
+						"{{child_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete milestone",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 no content\", function () {",
+							"   //Check for appropriate 2XX error message",
+							"   pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/milestones/{{milestone_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"milestones",
+						"{{milestone_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get child after milestone deleted",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"",
+							"pm.test(\"content is valid\", function () {",
+							"    pm.expect(pm.response.json()[\"first_name\"]).to.eq(\"Austin\");",
+							"    pm.expect(pm.response.json()[\"gender\"]).to.eq(\"male\");",
+							"    pm.expect(pm.response.json()[\"birthday\"]).to.eq(\"07/2019\");",
+							"",
+							"    const self_url = pm.environment.get(\"app_url\") + \"/children/\" + pm.response.json()[\"id\"];",
+							"    pm.expect(pm.response.json()[\"self\"]).to.eq(self_url);",
+							"    pm.expect(pm.response.json()[\"milestones_assigned\"]).to.deep.equal([]);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/children/{{child_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children",
+						"{{child_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete child",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 no content\", function () {",
+							"    //Check for appropriate 2XX status code",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/children/{{child_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children",
+						"{{child_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete child invalid child_id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"404 no content\", function () {",
+							"    //Check for appropriate 2XX status code",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"pm.test(\"404 error message\", function () {",
+							"    //Check for appropriate error message",
+							"    pm.expect(pm.response.json()[\"Error\"]).to.eq(\"No child with this child_id exists.\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/children/{{invalid_child_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children",
+						"{{invalid_child_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add child01",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"child01_id\", pm.response.json()[\"id\"]);",
+							"",
+							"pm.test(\"201 status code\", function () {",
+							"   pm.response.to.have.status(201);",
+							"});",
+							"",
+							"",
+							"pm.test(\"content is valid\", function () {",
+							"    pm.expect(pm.response.json()[\"first_name\"]).to.eq(\"Joel\");",
+							"    pm.expect(pm.response.json()[\"gender\"]).to.eq(\"male\");",
+							"    pm.expect(pm.response.json()[\"birthday\"]).to.eq(\"07/2020\");",
+							"",
+							"    const self_url = pm.environment.get(\"app_url\") + \"/children/\" + pm.response.json()[\"id\"];",
+							"    pm.expect(pm.response.json()[\"self\"]).to.eq(self_url);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"first_name\": \"Joel\",\n    \"gender\": \"male\",\n    \"birthday\": \"07/2020\"\n}\n"
+				},
+				"url": {
+					"raw": "{{app_url}}/children",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add milestone01",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"milestone01_id\", pm.response.json()[\"id\"]);",
+							"",
+							"pm.test(\"201 status code\", function () {",
+							"    //Check for 2XX status code",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"",
+							"pm.test(\"content is valid\", function () {",
+							"    //Check if the response content is valid and matches the expected values",
+							"    //Check if the self url is correct",
+							"    pm.expect(pm.response.json()[\"activity\"]).to.eq(\"Place baby tummy down on a blanket and move the blanket slowly around the room.\");",
+							"    pm.expect(pm.response.json()[\"category\"]).to.eq(\"Physical\");",
+							"    pm.expect(pm.response.json()[\"milestone\"]).to.eq(\"Moves head from side to side while lying on stomach\");",
+							"    pm.expect(pm.response.json()[\"age\"]).to.eq(\"0-1 month\");",
+							"    const self_url = pm.environment.get(\"app_url\") + \"/milestones/\" + pm.response.json()[\"id\"];",
+							"    pm.expect(pm.response.json()[\"self\"]).to.eq(self_url);",
+							"});",
+							"",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"activity\": \"Place baby tummy down on a blanket and move the blanket slowly around the room.\",\n    \"category\": \"Physical\",\n    \"milestone\": \"Moves head from side to side while lying on stomach\",\n    \"age\": \"0-1 month\"\n}\n"
+				},
+				"url": {
+					"raw": "{{app_url}}/milestones",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"milestones"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add milestone02",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"milestone02_id\", pm.response.json()[\"id\"]);",
+							"",
+							"pm.test(\"201 status code\", function () {",
+							"    //Check for 2XX status code",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"",
+							"pm.test(\"content is valid\", function () {",
+							"    //Check if the response content is valid and matches the expected values",
+							"    //Check if the self url is correct",
+							"    pm.expect(pm.response.json()[\"activity\"]).to.eq(\"Place baby tummy down on a blanket and move the blanket slowly around the room.\");",
+							"    pm.expect(pm.response.json()[\"category\"]).to.eq(\"Physical\");",
+							"    pm.expect(pm.response.json()[\"milestone\"]).to.eq(\"Moves head from side to side while lying on stomach\");",
+							"    pm.expect(pm.response.json()[\"age\"]).to.eq(\"0-1 month\");",
+							"    const self_url = pm.environment.get(\"app_url\") + \"/milestones/\" + pm.response.json()[\"id\"];",
+							"    pm.expect(pm.response.json()[\"self\"]).to.eq(self_url);",
+							"});",
+							"",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"activity\": \"Place baby tummy down on a blanket and move the blanket slowly around the room.\",\n    \"category\": \"Physical\",\n    \"milestone\": \"Moves head from side to side while lying on stomach\",\n    \"age\": \"0-1 month\"\n}\n"
+				},
+				"url": {
+					"raw": "{{app_url}}/milestones",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"milestones"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add milestone03",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"milestone03_id\", pm.response.json()[\"id\"]);",
+							"",
+							"pm.test(\"201 status code\", function () {",
+							"    //Check for 2XX status code",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"",
+							"pm.test(\"content is valid\", function () {",
+							"    //Check if the response content is valid and matches the expected values",
+							"    //Check if the self url is correct",
+							"    pm.expect(pm.response.json()[\"activity\"]).to.eq(\"Place baby tummy down on a blanket and move the blanket slowly around the room.\");",
+							"    pm.expect(pm.response.json()[\"category\"]).to.eq(\"Physical\");",
+							"    pm.expect(pm.response.json()[\"milestone\"]).to.eq(\"Moves head from side to side while lying on stomach\");",
+							"    pm.expect(pm.response.json()[\"age\"]).to.eq(\"0-1 month\");",
+							"    const self_url = pm.environment.get(\"app_url\") + \"/milestones/\" + pm.response.json()[\"id\"];",
+							"    pm.expect(pm.response.json()[\"self\"]).to.eq(self_url);",
+							"});",
+							"",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"activity\": \"Place baby tummy down on a blanket and move the blanket slowly around the room.\",\n    \"category\": \"Physical\",\n    \"milestone\": \"Moves head from side to side while lying on stomach\",\n    \"age\": \"0-1 month\"\n}\n"
+				},
+				"url": {
+					"raw": "{{app_url}}/milestones",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"milestones"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add milestone04",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"milestone04_id\", pm.response.json()[\"id\"]);",
+							"",
+							"pm.test(\"201 status code\", function () {",
+							"    //Check for 2XX status code",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"",
+							"pm.test(\"content is valid\", function () {",
+							"    //Check if the response content is valid and matches the expected values",
+							"    //Check if the self url is correct",
+							"    pm.expect(pm.response.json()[\"activity\"]).to.eq(\"Place baby tummy down on a blanket and move the blanket slowly around the room.\");",
+							"    pm.expect(pm.response.json()[\"category\"]).to.eq(\"Physical\");",
+							"    pm.expect(pm.response.json()[\"milestone\"]).to.eq(\"Moves head from side to side while lying on stomach\");",
+							"    pm.expect(pm.response.json()[\"age\"]).to.eq(\"0-1 month\");",
+							"    const self_url = pm.environment.get(\"app_url\") + \"/milestones/\" + pm.response.json()[\"id\"];",
+							"    pm.expect(pm.response.json()[\"self\"]).to.eq(self_url);",
+							"});",
+							"",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"activity\": \"Place baby tummy down on a blanket and move the blanket slowly around the room.\",\n    \"category\": \"Physical\",\n    \"milestone\": \"Moves head from side to side while lying on stomach\",\n    \"age\": \"0-1 month\"\n}\n"
+				},
+				"url": {
+					"raw": "{{app_url}}/milestones",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"milestones"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add milestone05",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"milestone05_id\", pm.response.json()[\"id\"]);",
+							"",
+							"pm.test(\"201 status code\", function () {",
+							"    //Check for 2XX status code",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"",
+							"pm.test(\"content is valid\", function () {",
+							"    //Check if the response content is valid and matches the expected values",
+							"    //Check if the self url is correct",
+							"    pm.expect(pm.response.json()[\"activity\"]).to.eq(\"Place baby tummy down on a blanket and move the blanket slowly around the room.\");",
+							"    pm.expect(pm.response.json()[\"category\"]).to.eq(\"Physical\");",
+							"    pm.expect(pm.response.json()[\"milestone\"]).to.eq(\"Moves head from side to side while lying on stomach\");",
+							"    pm.expect(pm.response.json()[\"age\"]).to.eq(\"0-1 month\");",
+							"    const self_url = pm.environment.get(\"app_url\") + \"/milestones/\" + pm.response.json()[\"id\"];",
+							"    pm.expect(pm.response.json()[\"self\"]).to.eq(self_url);",
+							"});",
+							"",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"activity\": \"Place baby tummy down on a blanket and move the blanket slowly around the room.\",\n    \"category\": \"Physical\",\n    \"milestone\": \"Moves head from side to side while lying on stomach\",\n    \"age\": \"0-1 month\"\n}\n"
+				},
+				"url": {
+					"raw": "{{app_url}}/milestones",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"milestones"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add milestone06",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"milestone06_id\", pm.response.json()[\"id\"]);",
+							"",
+							"pm.test(\"201 status code\", function () {",
+							"    //Check for 2XX status code",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"",
+							"pm.test(\"content is valid\", function () {",
+							"    //Check if the response content is valid and matches the expected values",
+							"    //Check if the self url is correct",
+							"    pm.expect(pm.response.json()[\"activity\"]).to.eq(\"Place baby tummy down on a blanket and move the blanket slowly around the room.\");",
+							"    pm.expect(pm.response.json()[\"category\"]).to.eq(\"Physical\");",
+							"    pm.expect(pm.response.json()[\"milestone\"]).to.eq(\"Moves head from side to side while lying on stomach\");",
+							"    pm.expect(pm.response.json()[\"age\"]).to.eq(\"0-1 month\");",
+							"    const self_url = pm.environment.get(\"app_url\") + \"/milestones/\" + pm.response.json()[\"id\"];",
+							"    pm.expect(pm.response.json()[\"self\"]).to.eq(self_url);",
+							"});",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"activity\": \"Place baby tummy down on a blanket and move the blanket slowly around the room.\",\n    \"category\": \"Physical\",\n    \"milestone\": \"Moves head from side to side while lying on stomach\",\n    \"age\": \"0-1 month\"\n}\n"
+				},
+				"url": {
+					"raw": "{{app_url}}/milestones",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"milestones"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get all milestones with pagination",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {",
+							"   //Check for appropriate 2XX status code",
+							"   pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"only correct number of milestones in response\", function () {",
+							"    //Check for correct number of loads",
+							"    pm.expect(pm.response.json()[\"milestones\"].length).to.eq(5);",
+							"});",
+							"",
+							"pm.test(\"next property exists\", function () {",
+							"    //Check if next property exists",
+							"    pm.expect(pm.response.json()).to.have.property(\"next\");",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/milestones",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"milestones"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "assign milestone01 to child01",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 status code\", function () {",
+							"    //Check for error code 2XX",
+							"    pm.response.to.have.status(204);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/children/{{child01_id}}/milestones/{{milestone01_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children",
+						"{{child01_id}}",
+						"milestones",
+						"{{milestone01_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "assign milestone02 to child01",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 status code\", function () {",
+							"    //Check for error code 2XX",
+							"    pm.response.to.have.status(204);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/children/{{child01_id}}/milestones/{{milestone02_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children",
+						"{{child01_id}}",
+						"milestones",
+						"{{milestone02_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "assign milestone03 to child01",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 status code\", function () {",
+							"    //Check for error code 2XX",
+							"    pm.response.to.have.status(204);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/children/{{child01_id}}/milestones/{{milestone03_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children",
+						"{{child01_id}}",
+						"milestones",
+						"{{milestone03_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "assign milestone04 to child01",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 status code\", function () {",
+							"    //Check for error code 2XX",
+							"    pm.response.to.have.status(204);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/children/{{child01_id}}/milestones/{{milestone04_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children",
+						"{{child01_id}}",
+						"milestones",
+						"{{milestone04_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "assign milestone05 to child01",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 status code\", function () {",
+							"    //Check for error code 2XX",
+							"    pm.response.to.have.status(204);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/children/{{child01_id}}/milestones/{{milestone05_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children",
+						"{{child01_id}}",
+						"milestones",
+						"{{milestone05_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "assign milestone06 to child01",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 status code\", function () {",
+							"    //Check for error code 2XX",
+							"    pm.response.to.have.status(204);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/children/{{child01_id}}/milestones/{{milestone06_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children",
+						"{{child01_id}}",
+						"milestones",
+						"{{milestone06_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get all milestones for given child",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {",
+							"    //Check for appropriate 2XX error message",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"load01 content is valid\", function () {",
+							"    pm.expect(pm.response.json().length).to.eq(6);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/children/{{child01_id}}/milestones",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children",
+						"{{child01_id}}",
+						"milestones"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get all milestones for child with invalid child id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"404 not found\", function () {",
+							"    //Check for appropriate 4XX status code",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"",
+							"pm.test(\"404 error message\", function () {",
+							"    //Check for appropriate status message",
+							"    pm.expect(pm.response.json()[\"Error\"]).to.eq(\"No child with this child_id exists.\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/children/{{invalid_child_id}}/milestones",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children",
+						"{{invalid_child_id}}",
+						"milestones"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add child02",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"child02_id\", pm.response.json()[\"id\"]);",
+							"",
+							"pm.test(\"201 status code\", function () {",
+							"   pm.response.to.have.status(201);",
+							"});",
+							"",
+							"",
+							"pm.test(\"content is valid\", function () {",
+							"    pm.expect(pm.response.json()[\"first_name\"]).to.eq(\"Joel\");",
+							"    pm.expect(pm.response.json()[\"gender\"]).to.eq(\"male\");",
+							"    pm.expect(pm.response.json()[\"birthday\"]).to.eq(\"07/2020\");",
+							"",
+							"    const self_url = pm.environment.get(\"app_url\") + \"/children/\" + pm.response.json()[\"id\"];",
+							"    pm.expect(pm.response.json()[\"self\"]).to.eq(self_url);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"first_name\": \"Joel\",\n    \"gender\": \"male\",\n    \"birthday\": \"07/2020\"\n}\n"
+				},
+				"url": {
+					"raw": "{{app_url}}/children",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add child03",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"child03_id\", pm.response.json()[\"id\"]);",
+							"",
+							"pm.test(\"201 status code\", function () {",
+							"   pm.response.to.have.status(201);",
+							"});",
+							"",
+							"",
+							"pm.test(\"content is valid\", function () {",
+							"    pm.expect(pm.response.json()[\"first_name\"]).to.eq(\"Joel\");",
+							"    pm.expect(pm.response.json()[\"gender\"]).to.eq(\"male\");",
+							"    pm.expect(pm.response.json()[\"birthday\"]).to.eq(\"07/2020\");",
+							"",
+							"    const self_url = pm.environment.get(\"app_url\") + \"/children/\" + pm.response.json()[\"id\"];",
+							"    pm.expect(pm.response.json()[\"self\"]).to.eq(self_url);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"first_name\": \"Joel\",\n    \"gender\": \"male\",\n    \"birthday\": \"07/2020\"\n}\n"
+				},
+				"url": {
+					"raw": "{{app_url}}/children",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add child04",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"child04_id\", pm.response.json()[\"id\"]);",
+							"",
+							"pm.test(\"201 status code\", function () {",
+							"   pm.response.to.have.status(201);",
+							"});",
+							"",
+							"",
+							"pm.test(\"content is valid\", function () {",
+							"    pm.expect(pm.response.json()[\"first_name\"]).to.eq(\"Joel\");",
+							"    pm.expect(pm.response.json()[\"gender\"]).to.eq(\"male\");",
+							"    pm.expect(pm.response.json()[\"birthday\"]).to.eq(\"07/2020\");",
+							"",
+							"    const self_url = pm.environment.get(\"app_url\") + \"/children/\" + pm.response.json()[\"id\"];",
+							"    pm.expect(pm.response.json()[\"self\"]).to.eq(self_url);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"first_name\": \"Joel\",\n    \"gender\": \"male\",\n    \"birthday\": \"07/2020\"\n}\n"
+				},
+				"url": {
+					"raw": "{{app_url}}/children",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add child05",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"child05_id\", pm.response.json()[\"id\"]);",
+							"",
+							"pm.test(\"201 status code\", function () {",
+							"   pm.response.to.have.status(201);",
+							"});",
+							"",
+							"",
+							"pm.test(\"content is valid\", function () {",
+							"    pm.expect(pm.response.json()[\"first_name\"]).to.eq(\"Joel\");",
+							"    pm.expect(pm.response.json()[\"gender\"]).to.eq(\"male\");",
+							"    pm.expect(pm.response.json()[\"birthday\"]).to.eq(\"07/2020\");",
+							"",
+							"    const self_url = pm.environment.get(\"app_url\") + \"/children/\" + pm.response.json()[\"id\"];",
+							"    pm.expect(pm.response.json()[\"self\"]).to.eq(self_url);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"first_name\": \"Joel\",\n    \"gender\": \"male\",\n    \"birthday\": \"07/2020\"\n}\n"
+				},
+				"url": {
+					"raw": "{{app_url}}/children",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add child06",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"child06_id\", pm.response.json()[\"id\"]);",
+							"",
+							"pm.test(\"201 status code\", function () {",
+							"   pm.response.to.have.status(201);",
+							"});",
+							"",
+							"",
+							"pm.test(\"content is valid\", function () {",
+							"    pm.expect(pm.response.json()[\"first_name\"]).to.eq(\"Joel\");",
+							"    pm.expect(pm.response.json()[\"gender\"]).to.eq(\"male\");",
+							"    pm.expect(pm.response.json()[\"birthday\"]).to.eq(\"07/2020\");",
+							"",
+							"    const self_url = pm.environment.get(\"app_url\") + \"/children/\" + pm.response.json()[\"id\"];",
+							"    pm.expect(pm.response.json()[\"self\"]).to.eq(self_url);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"first_name\": \"Joel\",\n    \"gender\": \"male\",\n    \"birthday\": \"07/2020\"\n}\n"
+				},
+				"url": {
+					"raw": "{{app_url}}/children",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get all children with pagination",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {",
+							"   //Check for appropriate 2XX status code",
+							"   pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"only correct number of children in response\", function () {",
+							"    //Check for correct number of loads",
+							"    pm.expect(pm.response.json()[\"children\"].length).to.eq(5);",
+							"});",
+							"",
+							"pm.test(\"next property exists\", function () {",
+							"    //Check if next property exists",
+							"    pm.expect(pm.response.json()).to.have.property(\"next\");",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/children",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete child01",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 no content\", function () {",
+							"    //Check for appropriate 2XX status code",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/children/{{child01_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children",
+						"{{child01_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete child02",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 no content\", function () {",
+							"    //Check for appropriate 2XX status code",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/children/{{child02_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children",
+						"{{child02_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete child03",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 no content\", function () {",
+							"    //Check for appropriate 2XX status code",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/children/{{child03_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children",
+						"{{child03_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete child04",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 no content\", function () {",
+							"    //Check for appropriate 2XX status code",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/children/{{child04_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children",
+						"{{child04_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete child05",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 no content\", function () {",
+							"    //Check for appropriate 2XX status code",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/children/{{child05_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children",
+						"{{child05_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete child06",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 no content\", function () {",
+							"    //Check for appropriate 2XX status code",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/children/{{child06_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"children",
+						"{{child06_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete milestone01",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 no content\", function () {",
+							"    //Check for appropriate 2XX status code",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/milestones/{{milestone01_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"milestones",
+						"{{milestone01_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete milestone02",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 no content\", function () {",
+							"    //Check for appropriate 2XX status code",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/milestones/{{milestone02_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"milestones",
+						"{{milestone02_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete milestone03",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 no content\", function () {",
+							"    //Check for appropriate 2XX status code",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/milestones/{{milestone03_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"milestones",
+						"{{milestone03_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete milestone04",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 no content\", function () {",
+							"    //Check for appropriate 2XX status code",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/milestones/{{milestone04_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"milestones",
+						"{{milestone04_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete milestone05",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 no content\", function () {",
+							"    //Check for appropriate 2XX status code",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/milestones/{{milestone05_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"milestones",
+						"{{milestone05_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete milestone06",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 no content\", function () {",
+							"    //Check for appropriate 2XX status code",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/milestones/{{milestone06_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"milestones",
+						"{{milestone06_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "405 method not allowed",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"405 method not allowed\", function () {\r",
+							"    //Check for appropriate 405 status code\r",
+							"    pm.response.to.have.status(405);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "COPY",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/milestones",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"milestones"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "view all users",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {",
+							"    //Check for 2XX status code",
+							"    pm.response.to.have.status(200);",
+							"}); "
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{app_url}}/users",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{jwt1}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

@@ -33,7 +33,7 @@ with open('osu.us.auth0.json') as f:
 if __name__ == '__main__':
 	CALLBACK_URL = 'http://localhost:8080/callback'
 else:
-	CALLBACK_URL = 'https://cs493assignment7.wm.r.appspot.com/callback'
+	CALLBACK_URL = 'https://cs493finalproject.wm.r.appspot.com/callback'
 
 ALGORITHMS = ["RS256"]
 CLIENT_ID = json_file['client_id']
